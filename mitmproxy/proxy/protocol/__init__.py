@@ -37,6 +37,7 @@ from .http2 import Http2Layer
 from .websocket import WebSocketLayer
 from .rawtcp import RawTCPLayer
 from .tls import TlsLayer
+from .tunnel import TunnelLayer
 
 __all__ = [
     "Layer", "ServerConnectionMixin",
@@ -47,4 +48,5 @@ __all__ = [
     "Http2Layer",
     "WebSocketLayer",
     "RawTCPLayer",
+    "TunnelLayer",
 ]

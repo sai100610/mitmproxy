@@ -143,6 +143,7 @@ class Reader(_FileLike):
             except SSL.Error as e:
                 raise exceptions.TlsException(str(e))
             self.first_byte_timestamp = self.first_byte_timestamp or time.time()
+
             if not data:
                 break
             result += data

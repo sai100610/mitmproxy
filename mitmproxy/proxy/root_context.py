@@ -62,6 +62,9 @@ class RootContext:
             if is_filtered:
                 return protocol.RawTCPLayer(top_layer, ignore=True)
 
+        if isinstance(top_layer, modes.TunnelProxy):
+            return protocol.TunnelLayer(top_layer)
+
         # 2. Always insert a TLS layer, even if there's neither client nor server tls.
         # An inline script may upgrade from http to https,
         # in which case we need some form of TLS layer.

@@ -61,7 +61,7 @@ class Core:
                     raise exceptions.OptionsError(
                         "Transparent mode not supported on this platform."
                     )
-            elif mode not in ["regular", "socks5"]:
+            elif mode not in ["regular", "socks5", "tunnel"]:
                 raise exceptions.OptionsError(
                     "Invalid mode specification: %s" % mode
                 )

@@ -95,6 +95,8 @@ class ConnectionHandler:
             )
         elif mode == "transparent":
             return modes.TransparentProxy(root_ctx)
+        elif mode == "tunnel":
+            return modes.TunnelProxy(root_ctx)
         elif mode.startswith("reverse:"):
             server_tls = self.config.upstream_server.scheme == "https"
             return modes.ReverseProxy(
