@@ -97,8 +97,11 @@ def flow_to_json(flow: mitmproxy.flow.Flow) -> dict:
             if flow.response.data.trailers:
                 f["response"]["trailers"] = tuple(flow.response.data.trailers.items(True))
 
-    f.get("server_conn", {}).pop("cert", None)
+    f.get("server_conn", {}).pop("certificate_list", None)
+    f.get("client_conn", {}).pop("certificate_list", None)
     f.get("client_conn", {}).pop("mitmcert", None)
+    f.get("server_conn", {}).pop("alpn_offers", None)
+    f.get("client_conn", {}).pop("alpn_offers", None)
 
     return f
 
@@ -124,7 +127,7 @@ class RequestHandler(tornado.web.RequestHandler):
         if isinstance(chunk, list):
             chunk = tornado.escape.json_encode(chunk)
             self.set_header("Content-Type", "application/json; charset=UTF-8")
-        super(RequestHandler, self).write(chunk)
+        super().write(chunk)
 
     def set_default_headers(self):
         super().set_default_headers()
@@ -312,7 +315,7 @@ class FlowHandler(RequestHandler):
                         elif k == "content":
                             request.text = v
                         else:
-                            raise APIError(400, "Unknown update request.{}: {}".format(k, v))
+                            raise APIError(400, f"Unknown update request.{k}: {v}")
 
                 elif a == "response" and hasattr(flow, "response"):
                     response = flow.response
@@ -332,9 +335,9 @@ class FlowHandler(RequestHandler):
                         elif k == "content":
                             response.text = v
                         else:
-                            raise APIError(400, "Unknown update response.{}: {}".format(k, v))
+                            raise APIError(400, f"Unknown update response.{k}: {v}")
                 else:
-                    raise APIError(400, "Unknown update {}: {}".format(a, b))
+                    raise APIError(400, f"Unknown update {a}: {b}")
         except APIError:
             flow.revert()
             raise
@@ -395,7 +398,7 @@ class FlowContent(RequestHandler):
             filename = self.flow.request.path.split("?")[0].split("/")[-1]
 
         filename = re.sub(r'[^-\w" .()]', "", filename)
-        cd = "attachment; filename={}".format(filename)
+        cd = f"attachment; filename={filename}"
         self.set_header("Content-Disposition", cd)
         self.set_header("Content-Type", "application/text")
         self.set_header("X-Content-Type-Options", "nosniff")
@@ -456,7 +459,7 @@ class Settings(RequestHandler):
         }
         for k in update:
             if k not in allowed_options:
-                raise APIError(400, "Unknown setting {}".format(k))
+                raise APIError(400, f"Unknown setting {k}")
         self.master.options.update(**update)
 
 
@@ -469,7 +472,7 @@ class Options(RequestHandler):
         try:
             self.master.options.update(**update)
         except Exception as err:
-            raise APIError(400, "{}".format(err))
+            raise APIError(400, f"{err}")
 
 
 class SaveOptions(RequestHandler):

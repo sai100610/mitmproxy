@@ -1,7 +1,5 @@
 import queue
-import socket
 from OpenSSL import SSL
-
 
 import wsproto
 from wsproto import events, WSConnection
@@ -9,11 +7,9 @@ from wsproto.connection import ConnectionType
 from wsproto.events import AcceptConnection, CloseConnection, Message, Ping, Request
 from wsproto.extensions import PerMessageDeflate
 
-from mitmproxy import exceptions
-from mitmproxy import flow
+from mitmproxy import exceptions, flow
 from mitmproxy.proxy.protocol import base
-from mitmproxy.net import tcp
-from mitmproxy.net import websockets
+from mitmproxy.net import tcp, websocket
 from mitmproxy.websocket import WebSocketFlow, WebSocketMessage
 from mitmproxy.utils import strutils
 
@@ -79,6 +75,10 @@ class WebSocketLayer(base.Layer):
         assert isinstance(next(self.connections[self.server_conn].events()), events.AcceptConnection)
 
     def _handle_event(self, event, source_conn, other_conn, is_server):
+        self.log(
+            "WebSocket Event from {}: {}".format("server" if is_server else "client", event),
+            "debug"
+        )
         if isinstance(event, events.Message):
             return self._handle_message(event, source_conn, other_conn, is_server)
         elif isinstance(event, events.Ping):
@@ -199,8 +199,17 @@ class WebSocketLayer(base.Layer):
                     other_conn = self.server_conn if conn == self.client_conn.connection else self.client_conn
                     is_server = (source_conn == self.server_conn)
 
-                    frame = websockets.Frame.from_file(source_conn.rfile)
-                    data = self.connections[source_conn].receive_data(bytes(frame))
+                    header, frame, consumed_bytes = websocket.read_frame(source_conn.rfile)
+                    self.log(
+                        "WebSocket Frame from {}: {}, {}".format(
+                            "server" if is_server else "client",
+                            header,
+                            frame,
+                        ),
+                        "debug"
+                    )
+
+                    data = self.connections[source_conn].receive_data(consumed_bytes)
                     source_conn.send(data)
 
                     if close_received:
@@ -210,7 +219,7 @@ class WebSocketLayer(base.Layer):
                         if not self._handle_event(event, source_conn, other_conn, is_server):
                             if not close_received:
                                 close_received = True
-        except (socket.error, exceptions.TcpException, SSL.Error) as e:
+        except (OSError, exceptions.TcpException, SSL.Error) as e:
             s = 'server' if is_server else 'client'
             self.flow.error = flow.Error("WebSocket connection closed unexpectedly by {}: {}".format(s, repr(e)))
             self.channel.tell("websocket_error", self.flow)

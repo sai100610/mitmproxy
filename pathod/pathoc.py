@@ -11,17 +11,13 @@ import time
 import OpenSSL.crypto
 import logging
 
-from mitmproxy import certs
-from mitmproxy import exceptions
-from mitmproxy.net import tcp, tls
-from mitmproxy.net import websockets
-from mitmproxy.net import socks
+from mitmproxy import certs, exceptions
+from mitmproxy.net import tcp, tls, socks
 from mitmproxy.net import http as net_http
 from mitmproxy.coretypes import basethread
 from mitmproxy.utils import strutils
 
-from pathod import log
-from pathod import language
+from pathod import language, log
 from pathod.protocols import http2
 
 
@@ -51,20 +47,20 @@ class SSLInfo:
             parts.append("  Certificate [%s]" % n)
             parts.append("\tSubject: ")
             for cn in i.get_subject().get_components():
-                parts.append("\t\t%s=%s" % (
+                parts.append("\t\t{}={}".format(
                     strutils.always_str(cn[0], "utf8"),
                     strutils.always_str(cn[1], "utf8"))
                 )
             parts.append("\tIssuer: ")
             for cn in i.get_issuer().get_components():
-                parts.append("\t\t%s=%s" % (
+                parts.append("\t\t{}={}".format(
                     strutils.always_str(cn[0], "utf8"),
                     strutils.always_str(cn[1], "utf8"))
                 )
             parts.extend(
                 [
                     "\tVersion: %s" % i.get_version(),
-                    "\tValidity: %s - %s" % (
+                    "\tValidity: {} - {}".format(
                         strutils.always_str(i.get_notBefore(), "utf8"),
                         strutils.always_str(i.get_notAfter(), "utf8")
                     ),
@@ -78,7 +74,7 @@ class SSLInfo:
                 OpenSSL.crypto.TYPE_DSA: "DSA"
             }
             t = types.get(pk.type(), "Uknown")
-            parts.append("\tPubkey: %s bit %s" % (pk.bits(), t))
+            parts.append(f"\tPubkey: {pk.bits()} bit {t}")
             s = certs.Cert(i)
             if s.altnames:
                 parts.append("\tSANs: %s" % " ".join(strutils.always_str(n, "utf8") for n in s.altnames))
@@ -139,7 +135,7 @@ class WebsocketFrameReader(basethread.BaseThread):
                 for rfile in r:
                     with self.logger.ctx() as log:
                         try:
-                            frm = websockets.Frame.from_file(self.rfile)
+                            frm = language.websockets_frame.Frame.from_file(self.rfile)
                         except exceptions.TcpDisconnect:
                             return
                         self.frames_queue.put(frm)
@@ -467,7 +463,7 @@ class Pathoc(tcp.TCPClient):
                 raise
             finally:
                 if resp:
-                    lg("<< %s %s: %s bytes" % (
+                    lg("<< {} {}: {} bytes".format(
                         resp.status_code, strutils.escape_control_characters(resp.reason) if resp.reason else "", len(resp.content)
                     ))
                     if resp.status_code in self.ignorecodes:

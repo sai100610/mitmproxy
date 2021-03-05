@@ -1,12 +1,34 @@
 Release History
 ###############
 
-Unreleased: mitmproxy next
-==========================
+15 December 2020: mitmproxy 6.0.2
+=================================
 
-* --- TODO: add new PRs above this line ---
+* Fix reading of saved flows in mitmweb.
 
-* ... and various other fixes, documentation improvements, dependency version bumps, etc.
+13 December 2020: mitmproxy 6.0.1
+=================================
+
+* Fix flow serialization in mitmweb.
+
+13 December 2020: mitmproxy 6.0
+===============================
+
+* Mitmproxy now requires Python 3.8 or above.
+* Deprecation of pathod and pathoc tools and modules. Future releases will not contain them! (@Kriechi)
+* SSLKEYLOGFILE now supports TLS 1.3 secrets (@mhils)
+* Fix query parameters in asgiapp addon (@jpstotz)
+* Fix command history failing on file I/O errors (@Kriechi)
+* Add example addon to suppress unwanted error messages sent by mitmproxy. (@anneborcherding)
+* Updated imports and styles for web scanner helper addons. (@anneborcherding)
+* Inform when underscore-formatted options are used in client arg. (@jrblixt)
+* ASGIApp now ignores loaded HTTP flows from somewhere. (@linw1995)
+* Binaries are now built with Python 3.9 (@mhils)
+* Fixed the web UI showing blank page on clicking details tab when server address is missing (@samhita-sopho)
+* Tests: Replace asynctest with stdlib mock (@felixonmars)
+* MapLocal now keeps its configuration when other options are set. (@mhils)
+* Host headers with non-standard ports are now properly updated in reverse proxy mode. (@mhils)
+* Fix missing host header when replaying HTTP/2 flows (@Granitosaurus)
 
 01 November 2020: mitmproxy 5.3
 ===============================

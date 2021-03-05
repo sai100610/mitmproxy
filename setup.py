@@ -34,8 +34,6 @@ setup(
         "Operating System :: POSIX",
         "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
@@ -65,6 +63,7 @@ setup(
             "pathoc = pathod.pathoc_cmdline:go_pathoc"
         ]
     },
+    python_requires='>=3.8',
     # https://packaging.python.org/en/latest/requirements/#install-requires
     # It is not considered best practice to use install_requires to pin dependencies to specific versions.
     install_requires=[
@@ -73,24 +72,24 @@ setup(
         "Brotli>=1.0,<1.1",
         "certifi>=2019.9.11",  # no semver here - this should always be on the last release!
         "click>=7.0,<8",
-        "cryptography>=3.2,<3.3",
+        "cryptography>=3.3,<3.4",
         "flask>=1.1.1,<1.2",
-        "h2>=4.0,<5; python_version>='3.6.0'",  # python_version only needed to make "py36+ required" message work
-        "hyperframe>=6.0,<7; python_version>='3.6.0'",  # python_version only needed to make "py36+ required" message work
+        "h2>=4.0,<5",
+        "hyperframe>=6.0,<7",
         "kaitaistruct>=0.7,<0.10",
         "ldap3>=2.8,<2.9",
         "msgpack>=1.0.0, <1.1.0",
         "passlib>=1.6.5, <1.8",
-        "protobuf>=3.6.0, <3.14",
+        "protobuf>=3.14,<3.15",
         "pyasn1>=0.3.1,<0.5",
-        "pyOpenSSL>=19.1.0,<19.2",
+        "pyOpenSSL>=20.0,<20.1",
         "pyparsing>=2.4.2,<2.5",
         "pyperclip>=1.6.0,<1.9",
         "ruamel.yaml>=0.16,<0.17",
-        "sortedcontainers>=2.1,<2.3",
+        "sortedcontainers>=2.3,<2.4",
         "tornado>=4.3,<7",
         "urwid>=2.1.1,<2.2",
-        "wsproto>=0.14,<0.16",
+        "wsproto>=1.0,<1.1",
         "publicsuffix2>=2.20190812,<3",
         "zstandard>=0.11,<0.15",
     ],
@@ -98,12 +97,7 @@ setup(
         ':sys_platform == "win32"': [
             "pydivert>=2.0.3,<2.2",
         ],
-        ':python_version == "3.6"': [
-            "dataclasses>=0.7",
-        ],
         'dev': [
-            "asynctest>=0.12.0",
-            "Flask>=1.0,<1.2",
             "hypothesis>=5.8,<6",
             "parver>=0.1,<2.0",
             "pytest-asyncio>=0.10.0,<0.14,!=0.14",
